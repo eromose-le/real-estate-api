@@ -1,0 +1,35 @@
+import express, { Express } from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import { green, white } from "console-log-colors";
+
+import authRoute from "./src/routes/auth.route";
+// import postRoute from "./src/routes/post.route.js";
+// import testRoute from "./src/routes/test.route.js";
+// import userRoute from "./src/routes/user.route.js";
+// import chatRoute from "./src/routes/chat.route.js";
+// import messageRoute from "./src/routes/message.route.js";
+
+const app: Express = express();
+const apiPath = "/api/v1/";
+
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(express.json());
+app.use(cookieParser());
+
+app.use(`${apiPath}/auth`, authRoute);
+// app.use(`${apiPath}/users`, userRoute);
+// app.use(`${apiPath}/posts`, postRoute);
+// app.use(`${apiPath}/test`, testRoute);
+// app.use(`${apiPath}/chats`, chatRoute);
+// app.use(`${apiPath}/messages`, messageRoute);
+
+const PORT = process.env.PORT || 8888;
+
+app.listen(8800, () => {
+  console.log(
+    green.bgWhiteBright(
+      `Server is running on  - ${white.bgGreenBright.bold(PORT)}`
+    )
+  );
+});

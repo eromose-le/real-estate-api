@@ -1,0 +1,30 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const console_log_colors_1 = require("console-log-colors");
+const auth_route_1 = __importDefault(require("./src/routes/auth.route"));
+// import postRoute from "./src/routes/post.route.js";
+// import testRoute from "./src/routes/test.route.js";
+// import userRoute from "./src/routes/user.route.js";
+// import chatRoute from "./src/routes/chat.route.js";
+// import messageRoute from "./src/routes/message.route.js";
+const app = (0, express_1.default)();
+const apiPath = "/api/v1/";
+app.use((0, cors_1.default)({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(express_1.default.json());
+app.use((0, cookie_parser_1.default)());
+app.use(`${apiPath}/auth`, auth_route_1.default);
+// app.use(`${apiPath}/users`, userRoute);
+// app.use(`${apiPath}/posts`, postRoute);
+// app.use(`${apiPath}/test`, testRoute);
+// app.use(`${apiPath}/chats`, chatRoute);
+// app.use(`${apiPath}/messages`, messageRoute);
+const PORT = process.env.PORT || 8888;
+app.listen(8800, () => {
+    console.log(console_log_colors_1.green.bgWhiteBright(`Server is running on  - ${console_log_colors_1.white.bgGreenBright.bold(PORT)}`));
+});

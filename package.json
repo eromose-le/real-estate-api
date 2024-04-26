@@ -1,28 +1,41 @@
 {
   "name": "rd-real-estate-api",
   "version": "1.0.0",
-  "description": "> console-ninja node --watch app.js > # Resources > - https://app.eraser.io >  - For illustrated diagrams, flow chart e.t.c",
+  "description": "",
   "main": "app.js",
-  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "console-ninja node --watch app.js",
-    "run-migration": "npx prisma db push"
+    "dev": "console-ninja node --watch dist/app.js",
+    "run-migration": "npx prisma db push",
+    "build": "rimraf dist && npx tsc",
+    "prestart": "npm run build",
+    "start": "console-ninja node --watch dist/app.js",
+    "preserve": "npm run build",
+    "serve": "concurrently \"npx tsc -w\"  \"console-ninja node --watch dist/app.js\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.11.0",
+    "@types/express": "^4.17.13",
+    "@types/node": "^18.7.16",
     "bcrypt": "^5.1.1",
+    "concurrently": "^7.4.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.18.3",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.11.0"
+    "prisma": "^5.11.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^5.4.5"
   },
   "directories": {
     "lib": "lib"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
+    "console-log-colors": "^0.4.0"
+  }
 }
