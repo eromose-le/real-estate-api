@@ -44,6 +44,12 @@ export const errorHandler = (
     error = new ErrorResponse(JSON.stringify(message), 400);
   }
 
+  // PrismaClientInitializationError
+  if (err.name === "PrismaClientInitializationError") {
+    const message = "Prisma connection failed";
+    error = new ErrorResponse(message, 500);
+  }
+
   res.status(error.statusCode || 500).json({
     statusCode: error.statusCode,
     success: false,

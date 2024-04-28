@@ -5,6 +5,7 @@ import { ErrorResponse } from "../utils/errorResponse";
 import { NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { EnvKeys } from "../common/EnvKeys";
+import { RegisterUserDto } from "types/auth.types";
 
 export class AuthService {
   async hashPassword(_password: string): Promise<string> {
@@ -39,7 +40,7 @@ export class AuthService {
     }
   }
 
-  async validatedUsername(_username: string, _next: any) {
+  async validatedUsername(_username: string, _next: NextFunction) {
     try {
       const user = await prisma.user.findUnique({
         where: { username: _username },
@@ -55,12 +56,16 @@ export class AuthService {
       }
 
       return user;
-    } catch (err: any) {
+    } catch (err) {
       return _next(err);
     }
   }
 
-  async comparePassword(_password: string, _userPassword: string, _next?: any) {
+  async comparePassword(
+    _password: string,
+    _userPassword: string,
+    _next: NextFunction
+  ) {
     try {
       const isPasswordValid = await bcrypt.compare(_password, _userPassword);
 
@@ -74,7 +79,7 @@ export class AuthService {
       }
 
       return isPasswordValid;
-    } catch (err: any) {
+    } catch (err) {
       return _next(err);
     }
   }

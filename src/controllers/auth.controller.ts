@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
 import { UserService } from "../services/user.service";
+import { LoginUserDto, RegisterUserDto } from "../types/auth.types";
 
 const authService = new AuthService();
 const userService = new UserService();
 
 export const register = async (
-  req: { body: { username: any; email: any; password: any } },
+  req: { body: RegisterUserDto },
   res: Response
 ) => {
   const { username, email, password } = req.body;
@@ -19,17 +20,23 @@ export const register = async (
       password: hashedPassword,
     });
 
-    return res
-      .status(201)
-      .json({ message: "User created successfully", data: newUser });
+    return res.status(201).json({
+      message: "User created successfully",
+      data: newUser,
+      success: !!newUser,
+    });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "An error occured" });
+    const errorPayloadRes = {
+      statusCode: 500,
+      success: false,
+      error: "An error occured",
+    };
+    return res.status(errorPayloadRes.statusCode).json({ ...errorPayloadRes });
   }
 };
 
 export const login = async (
-  req: Request,
+  req: { body: LoginUserDto },
   res: Response,
   next: NextFunction
 ) => {
@@ -68,14 +75,22 @@ export const login = async (
         .json({
           message: "User login successfully",
           data: userInfo,
-          success: true,
+          success: !!userInfo,
         });
     }
   } catch (err) {
-    res.status(500).json({ message: "Failed to login!" });
+    const errorPayloadRes = {
+      statusCode: 500,
+      success: false,
+      error: "Failed to login!",
+    };
+    return res.status(errorPayloadRes.statusCode).json({ ...errorPayloadRes });
   }
 };
 
 export const logout = (req: Request, res: Response) => {
-  res.clearCookie("token").status(200).json({ message: "Logout Successful" });
+  return res
+    .clearCookie("token")
+    .status(200)
+    .json({ message: "Logout Successful" });
 };

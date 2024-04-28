@@ -34,13 +34,19 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             email,
             password: hashedPassword,
         });
-        return res
-            .status(201)
-            .json({ message: "User created successfully", data: newUser });
+        return res.status(201).json({
+            message: "User created successfully",
+            data: newUser,
+            success: !!newUser,
+        });
     }
     catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "An error occured" });
+        const errorPayloadRes = {
+            statusCode: 500,
+            success: false,
+            error: "An error occured",
+        };
+        return res.status(errorPayloadRes.statusCode).json(Object.assign({}, errorPayloadRes));
     }
 });
 exports.register = register;
@@ -70,16 +76,24 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
                 .json({
                 message: "User login successfully",
                 data: userInfo,
-                success: true,
+                success: !!userInfo,
             });
         }
     }
     catch (err) {
-        res.status(500).json({ message: "Failed to login!" });
+        const errorPayloadRes = {
+            statusCode: 500,
+            success: false,
+            error: "Failed to login!",
+        };
+        return res.status(errorPayloadRes.statusCode).json(Object.assign({}, errorPayloadRes));
     }
 });
 exports.login = login;
 const logout = (req, res) => {
-    res.clearCookie("token").status(200).json({ message: "Logout Successful" });
+    return res
+        .clearCookie("token")
+        .status(200)
+        .json({ message: "Logout Successful" });
 };
 exports.logout = logout;
