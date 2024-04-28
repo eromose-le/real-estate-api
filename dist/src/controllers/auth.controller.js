@@ -23,73 +23,52 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.login = exports.register = void 0;
 const auth_service_1 = require("../services/auth.service");
 const user_service_1 = require("../services/user.service");
+const async_1 = require("../middleware/async");
 const authService = new auth_service_1.AuthService();
 const userService = new user_service_1.UserService();
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.register = (0, async_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = req.body;
-    try {
-        const hashedPassword = yield authService.hashPassword(password);
-        const newUser = yield authService.register({
-            username,
-            email,
-            password: hashedPassword,
-        });
-        return res.status(201).json({
-            message: "User created successfully",
-            data: newUser,
-            success: !!newUser,
-        });
-    }
-    catch (err) {
-        const errorPayloadRes = {
-            statusCode: 500,
-            success: false,
-            error: "An error occured",
-        };
-        return res.status(errorPayloadRes.statusCode).json(Object.assign({}, errorPayloadRes));
-    }
-});
-exports.register = register;
-const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const hashedPassword = yield authService.hashPassword(password);
+    const newUser = yield authService.register({
+        username,
+        email,
+        password: hashedPassword,
+    });
+    return res.status(201).json({
+        message: "User created successfully",
+        data: newUser,
+        success: !!newUser,
+    });
+}));
+exports.login = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password } = req.body;
-    try {
-        const userExist = yield authService.validatedUsername(username, next);
-        if (!userExist)
-            return;
-        const isPasswordValid = yield authService.comparePassword(password, userExist === null || userExist === void 0 ? void 0 : userExist.password, next);
-        if (!isPasswordValid)
-            return;
-        const isValid = !!userExist && isPasswordValid;
-        if (!isValid)
-            return;
-        if (isValid) {
-            const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
-            const token = yield authService.generateCookieToken(userExist === null || userExist === void 0 ? void 0 : userExist.id, SEVEN_DAYS);
-            const { password: userPassword } = userExist, userInfo = __rest(userExist, ["password"]);
-            res
-                .cookie("token", token, {
-                httpOnly: true, // Only client-side js access
-                // ...(false && { secure: true }), // Only https access
-                maxAge: SEVEN_DAYS,
-            })
-                .status(200)
-                .json({
-                message: "User login successfully",
-                data: userInfo,
-                success: !!userInfo,
-            });
-        }
+    const userExist = yield authService.validatedUsername(username, next);
+    if (!userExist)
+        return;
+    const isPasswordValid = yield authService.comparePassword(password, userExist === null || userExist === void 0 ? void 0 : userExist.password, next);
+    if (!isPasswordValid)
+        return;
+    const isValid = !!userExist && isPasswordValid;
+    if (!isValid)
+        return;
+    if (isValid) {
+        const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
+        const token = yield authService.generateCookieToken(userExist === null || userExist === void 0 ? void 0 : userExist.id, SEVEN_DAYS);
+        const { password: userPassword } = userExist, userInfo = __rest(userExist, ["password"]);
+        res
+            .cookie("token", token, {
+            httpOnly: true, // Only client-side js access
+            // ...(false && { secure: true }), // Only https access
+            maxAge: SEVEN_DAYS,
+        })
+            .status(200)
+            .json({
+            message: "User login successfully",
+            data: userInfo,
+            success: !!userInfo,
+        });
     }
-    catch (err) {
-        const errorPayloadRes = {
-            statusCode: 500,
-            success: false,
-            error: "Failed to login!",
-        };
-        return res.status(errorPayloadRes.statusCode).json(Object.assign({}, errorPayloadRes));
-    }
-});
-exports.login = login;
+}));
 const logout = (req, res) => {
     return res
         .clearCookie("token")

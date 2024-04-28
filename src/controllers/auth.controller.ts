@@ -2,17 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
 import { UserService } from "../services/user.service";
 import { LoginUserDto, RegisterUserDto } from "../types/auth.types";
+import { asyncHandler } from "../middleware/async";
 
 const authService = new AuthService();
 const userService = new UserService();
 
-export const register = async (
-  req: { body: RegisterUserDto },
-  res: Response
-) => {
-  const { username, email, password } = req.body;
+export const register = asyncHandler(
+  async (req: { body: RegisterUserDto }, res: Response) => {
+    const { username, email, password } = req.body;
 
-  try {
     const hashedPassword: string = await authService.hashPassword(password);
     const newUser = await authService.register({
       username,
@@ -25,24 +23,13 @@ export const register = async (
       data: newUser,
       success: !!newUser,
     });
-  } catch (err) {
-    const errorPayloadRes = {
-      statusCode: 500,
-      success: false,
-      error: "An error occured",
-    };
-    return res.status(errorPayloadRes.statusCode).json({ ...errorPayloadRes });
   }
-};
+);
 
-export const login = async (
-  req: { body: LoginUserDto },
-  res: Response,
-  next: NextFunction
-) => {
-  const { username, password } = req.body;
+export const login = asyncHandler(
+  async (req: { body: LoginUserDto }, res: Response, next: NextFunction) => {
+    const { username, password } = req.body;
 
-  try {
     const userExist = await authService.validatedUsername(username, next);
     if (!userExist) return;
 
@@ -78,15 +65,8 @@ export const login = async (
           success: !!userInfo,
         });
     }
-  } catch (err) {
-    const errorPayloadRes = {
-      statusCode: 500,
-      success: false,
-      error: "Failed to login!",
-    };
-    return res.status(errorPayloadRes.statusCode).json({ ...errorPayloadRes });
   }
-};
+);
 
 export const logout = (req: Request, res: Response) => {
   return res
