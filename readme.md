@@ -8,3 +8,5 @@
 
 # After any update on prisma schema,
 > run npx prisma db push
+> 
+    "serve": "concurrently \"npx tsc -w\"  \"console-ninja node --env-file .env --watch dist/app.js\""

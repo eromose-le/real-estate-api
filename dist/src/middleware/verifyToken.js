@@ -12,24 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserService = void 0;
-const constants_1 = require("../constants");
-const prisma_1 = __importDefault(require("../lib/prisma"));
-class UserService {
-    getUserByUsername(_username) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const user = yield prisma_1.default.user.findUnique({
-                    where: { username: _username },
-                });
-                if (!user)
-                    throw new Error(constants_1.ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL_OR_USERNAME);
-                return user;
-            }
-            catch (err) {
-                return err;
-            }
-        });
-    }
-}
-exports.UserService = UserService;
+exports.verifyToken = void 0;
+const EnvKeys_1 = require("../common/EnvKeys");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const verifyToken = (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token)
+        return res.status(401).json({ message: "Not Authenticated!" });
+    const secret = EnvKeys_1.EnvKeys.JWT_SECRET;
+    jsonwebtoken_1.default.verify(token, secret, (err, payload) => __awaiter(void 0, void 0, void 0, function* () {
+        if (err)
+            return res.status(403).json({ message: "Token is not Valid!" });
+        req.userId = payload.id;
+        next();
+    }));
+};
+exports.verifyToken = verifyToken;

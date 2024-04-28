@@ -8,15 +8,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.register = void 0;
+exports.logout = exports.login = exports.register = void 0;
 const auth_service_1 = require("../services/auth.service");
 const user_service_1 = require("../services/user.service");
 const authService = new auth_service_1.AuthService();
 const userService = new user_service_1.UserService();
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = req.body;
-    console.log({ username, email, password });
     try {
         const hashedPassword = yield authService.hashPassword(password);
         const newUser = yield authService.register({
@@ -24,9 +34,9 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             email,
             password: hashedPassword,
         });
-        console.log("[CONTROLLER]", hashedPassword);
-        console.log("[CONTROLLER]", newUser);
-        return res.status(201).json({ message: "User created successfully" });
+        return res
+            .status(201)
+            .json({ message: "User created successfully", data: newUser });
     }
     catch (err) {
         console.log(err);
@@ -34,3 +44,42 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.register = register;
+const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { username, password } = req.body;
+    try {
+        const userExist = yield authService.validatedUsername(username, next);
+        if (!userExist)
+            return;
+        const isPasswordValid = yield authService.comparePassword(password, userExist === null || userExist === void 0 ? void 0 : userExist.password, next);
+        if (!isPasswordValid)
+            return;
+        const isValid = !!userExist && isPasswordValid;
+        if (!isValid)
+            return;
+        if (isValid) {
+            const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
+            const token = yield authService.generateCookieToken(userExist === null || userExist === void 0 ? void 0 : userExist.id, SEVEN_DAYS);
+            const { password: userPassword } = userExist, userInfo = __rest(userExist, ["password"]);
+            res
+                .cookie("token", token, {
+                httpOnly: true, // Only client-side js access
+                // ...(false && { secure: true }), // Only https access
+                maxAge: SEVEN_DAYS,
+            })
+                .status(200)
+                .json({
+                message: "User login successfully",
+                data: userInfo,
+                success: true,
+            });
+        }
+    }
+    catch (err) {
+        res.status(500).json({ message: "Failed to login!" });
+    }
+});
+exports.login = login;
+const logout = (req, res) => {
+    res.clearCookie("token").status(200).json({ message: "Logout Successful" });
+};
+exports.logout = logout;

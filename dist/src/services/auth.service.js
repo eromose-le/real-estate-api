@@ -15,6 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const prisma_1 = __importDefault(require("../lib/prisma"));
+const constants_1 = require("../constants");
+const errorResponse_1 = require("../utils/errorResponse");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const EnvKeys_1 = require("../common/EnvKeys");
 class AuthService {
     hashPassword(_password) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -23,6 +27,52 @@ class AuthService {
             }
             catch (err) {
                 return err;
+            }
+        });
+    }
+    generateCookieToken(_userId, _expireTime) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const secret = EnvKeys_1.EnvKeys.JWT_SECRET;
+                // res.setHeader("Set-Cookie", "test=" + "myValue").json("success")
+                const token = jsonwebtoken_1.default.sign({
+                    id: _userId,
+                    isAdmin: false,
+                }, secret, { expiresIn: _expireTime });
+                return token;
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
+    validatedUsername(_username, _next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield prisma_1.default.user.findUnique({
+                    where: { username: _username },
+                });
+                if (!user) {
+                    return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.INVALID_CREDENTIALS, constants_1.HTTP_STATUS_CODE[400].code));
+                }
+                return user;
+            }
+            catch (err) {
+                return _next(err);
+            }
+        });
+    }
+    comparePassword(_password, _userPassword, _next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const isPasswordValid = yield bcrypt_1.default.compare(_password, _userPassword);
+                if (!isPasswordValid) {
+                    return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.INVALID_CREDENTIALS, constants_1.HTTP_STATUS_CODE[400].code));
+                }
+                return isPasswordValid;
+            }
+            catch (err) {
+                return _next(err);
             }
         });
     }
@@ -39,7 +89,6 @@ class AuthService {
                 return newUser;
             }
             catch (err) {
-                console.log(err);
                 return err;
             }
         });
