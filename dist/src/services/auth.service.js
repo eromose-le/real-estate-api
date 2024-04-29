@@ -62,6 +62,22 @@ class AuthService {
             }
         });
     }
+    validatedEmail(_email, _next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield prisma_1.default.user.findUnique({
+                    where: { email: _email },
+                });
+                if (!user) {
+                    return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.INVALID_CREDENTIALS, constants_1.HTTP_STATUS_CODE[400].code));
+                }
+                return user;
+            }
+            catch (err) {
+                return _next(err);
+            }
+        });
+    }
     comparePassword(_password, _userPassword, _next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -76,11 +92,29 @@ class AuthService {
             }
         });
     }
+    canRegister(_payload, _next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const [username, email] = yield Promise.all([
+                    this.validatedUsername(_payload.username, _next),
+                    this.validatedEmail(_payload.email, _next),
+                ]);
+                if (!!username || !!email) {
+                    return !(!!username && !!email);
+                }
+                return true;
+            }
+            catch (err) {
+                return _next(err);
+            }
+        });
+    }
     register(_a, _next_1) {
         return __awaiter(this, arguments, void 0, function* ({ username, email, password }, _next) {
             try {
-                const userExist = yield this.validatedUsername(username, _next);
-                if (userExist)
+                const payload = { username, email };
+                const canRegister = yield this.canRegister(Object.assign({}, payload), _next);
+                if (!canRegister)
                     return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL_OR_USERNAME, constants_1.HTTP_STATUS_CODE[400].code));
                 const newUser = yield prisma_1.default.user.create({
                     data: {

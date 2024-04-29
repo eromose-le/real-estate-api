@@ -61,6 +61,27 @@ export class AuthService {
     }
   }
 
+  async validatedEmail(_email: string, _next: NextFunction) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { email: _email },
+      });
+
+      if (!user) {
+        return _next(
+          new ErrorResponse(
+            ERROR_MESSAGES.INVALID_CREDENTIALS,
+            HTTP_STATUS_CODE[400].code
+          )
+        );
+      }
+
+      return user;
+    } catch (err) {
+      return _next(err);
+    }
+  }
+
   async comparePassword(
     _password: string,
     _userPassword: string,
@@ -84,13 +105,38 @@ export class AuthService {
     }
   }
 
+  async canRegister(
+    _payload: {
+      email: string;
+      username: string;
+    },
+    _next: NextFunction
+  ): Promise<boolean | void> {
+    try {
+      const [username, email] = await Promise.all([
+        this.validatedUsername(_payload.username, _next),
+        this.validatedEmail(_payload.email, _next),
+      ]);
+
+      if (!!username || !!email) {
+        return !(!!username && !!email);
+      }
+
+      return true;
+    } catch (err) {
+      return _next(err);
+    }
+  }
+
   async register(
     { username, email, password }: RegisterUserDto,
     _next: NextFunction
   ) {
     try {
-      const userExist = await this.validatedUsername(username, _next);
-      if (userExist)
+      const payload = { username, email };
+      const canRegister = await this.canRegister({ ...payload }, _next);
+
+      if (!canRegister)
         return _next(
           new ErrorResponse(
             ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL_OR_USERNAME,
