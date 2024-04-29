@@ -7,7 +7,6 @@ const utils_1 = require("../utils");
 const errorHandler = (err, req, res, next) => {
     let error = Object.assign({}, err);
     error.message = err.message;
-    console.log(err);
     if (EnvKeys_1.EnvKeys.isLocal())
         console.log(`${err}\n${(0, utils_1.logError)("NAME", err.name)}\n${(0, utils_1.logError)("STATUS", err.success)}\n${(0, utils_1.logError)("MESSAGE", err.error)}\n${(0, utils_1.logError)("STATUS_CODE", err.statusCode)}`);
     // Mongoose bad ObjectId
@@ -29,6 +28,11 @@ const errorHandler = (err, req, res, next) => {
     if (err.name === "PrismaClientInitializationError") {
         const message = "Prisma connection failed";
         error = new errorResponse_1.ErrorResponse(message, 500);
+    }
+    // PrismaClientKnownRequestError
+    if (err.name === "PrismaClientKnownRequestError") {
+        const message = "Record already exist";
+        error = new errorResponse_1.ErrorResponse(message, 400);
     }
     res.status(error.statusCode || 500).json({
         statusCode: error.statusCode,

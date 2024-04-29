@@ -84,8 +84,20 @@ export class AuthService {
     }
   }
 
-  async register({ username, email, password }: RegisterUserDto) {
+  async register(
+    { username, email, password }: RegisterUserDto,
+    _next: NextFunction
+  ) {
     try {
+      const userExist = await this.validatedUsername(username, _next);
+      if (userExist)
+        return _next(
+          new ErrorResponse(
+            ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL_OR_USERNAME,
+            HTTP_STATUS_CODE[400].code
+          )
+        );
+
       const newUser = await prisma.user.create({
         data: {
           username,
@@ -96,7 +108,7 @@ export class AuthService {
 
       return newUser;
     } catch (err) {
-      return err;
+      return _next(err);
     }
   }
 }

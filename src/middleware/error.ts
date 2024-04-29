@@ -13,8 +13,6 @@ export const errorHandler = (
 
   error.message = err.message;
 
-  console.log(err);
-
   if (EnvKeys.isLocal())
     console.log(
       `${err}\n${logError("NAME", err.name)}\n${logError(
@@ -48,6 +46,12 @@ export const errorHandler = (
   if (err.name === "PrismaClientInitializationError") {
     const message = "Prisma connection failed";
     error = new ErrorResponse(message, 500);
+  }
+
+  // PrismaClientKnownRequestError
+  if (err.name === "PrismaClientKnownRequestError") {
+    const message = "Record already exist";
+    error = new ErrorResponse(message, 400);
   }
 
   res.status(error.statusCode || 500).json({

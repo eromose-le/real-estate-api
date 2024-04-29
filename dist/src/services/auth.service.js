@@ -76,9 +76,12 @@ class AuthService {
             }
         });
     }
-    register(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ username, email, password }) {
+    register(_a, _next_1) {
+        return __awaiter(this, arguments, void 0, function* ({ username, email, password }, _next) {
             try {
+                const userExist = yield this.validatedUsername(username, _next);
+                if (userExist)
+                    return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL_OR_USERNAME, constants_1.HTTP_STATUS_CODE[400].code));
                 const newUser = yield prisma_1.default.user.create({
                     data: {
                         username,
@@ -89,7 +92,7 @@ class AuthService {
                 return newUser;
             }
             catch (err) {
-                return err;
+                return _next(err);
             }
         });
     }

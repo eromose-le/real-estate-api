@@ -26,15 +26,17 @@ const user_service_1 = require("../services/user.service");
 const async_1 = require("../middleware/async");
 const authService = new auth_service_1.AuthService();
 const userService = new user_service_1.UserService();
-exports.register = (0, async_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.register = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = req.body;
     const hashedPassword = yield authService.hashPassword(password);
     const newUser = yield authService.register({
         username,
         email,
         password: hashedPassword,
-    });
-    return res.status(201).json({
+    }, next);
+    if (!newUser)
+        return;
+    res.status(201).json({
         message: "User created successfully",
         data: newUser,
         success: !!newUser,

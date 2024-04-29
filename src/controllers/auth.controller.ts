@@ -8,17 +8,21 @@ const authService = new AuthService();
 const userService = new UserService();
 
 export const register = asyncHandler(
-  async (req: { body: RegisterUserDto }, res: Response) => {
+  async (req: { body: RegisterUserDto }, res: Response, next: NextFunction) => {
     const { username, email, password } = req.body;
 
     const hashedPassword: string = await authService.hashPassword(password);
-    const newUser = await authService.register({
-      username,
-      email,
-      password: hashedPassword,
-    });
+    const newUser = await authService.register(
+      {
+        username,
+        email,
+        password: hashedPassword,
+      },
+      next
+    );
+    if (!newUser) return;
 
-    return res.status(201).json({
+    res.status(201).json({
       message: "User created successfully",
       data: newUser,
       success: !!newUser,
