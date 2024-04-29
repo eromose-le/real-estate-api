@@ -36,10 +36,11 @@ exports.register = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 
     }, next);
     if (!newUser)
         return;
+    const { password: userPassword } = newUser, userInfo = __rest(newUser, ["password"]);
     res.status(201).json({
         message: "User created successfully",
-        data: newUser,
-        success: !!newUser,
+        data: userInfo,
+        success: !!userInfo,
     });
 }));
 exports.login = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

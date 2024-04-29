@@ -22,10 +22,11 @@ export const register = asyncHandler(
     );
     if (!newUser) return;
 
+    const { password: userPassword, ...userInfo } = newUser;
     res.status(201).json({
       message: "User created successfully",
-      data: newUser,
-      success: !!newUser,
+      data: userInfo,
+      success: !!userInfo,
     });
   }
 );
@@ -50,7 +51,7 @@ export const login = asyncHandler(
 
     if (isValid) {
       const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
-      
+
       const token = await authService.generateCookieToken(
         userExist?.id,
         SEVEN_DAYS
