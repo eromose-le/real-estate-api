@@ -19,7 +19,10 @@ const constants_1 = require("../constants");
 const errorResponse_1 = require("../utils/errorResponse");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const EnvKeys_1 = require("../common/EnvKeys");
+const user_service_1 = require("./user.service");
+const userService = new user_service_1.UserService();
 class AuthService {
+    // constructor(public userService: UserService) {}
     hashPassword(_password) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -96,13 +99,19 @@ class AuthService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const [username, email] = yield Promise.all([
-                    this.validatedUsername(_payload.username, _next),
-                    this.validatedEmail(_payload.email, _next),
+                    userService.getUserByUsername(_payload.username, _next),
+                    userService.getUserByEmail(_payload.email, _next),
                 ]);
-                if (!!username || !!email) {
-                    return !(!!username && !!email);
-                }
-                return true;
+                const result = {
+                    isCanRegister: !(!!username && !!email),
+                    isUsernameExist: !!username,
+                    isEmailExist: !!email,
+                };
+                return {
+                    isCanRegister: result === null || result === void 0 ? void 0 : result.isCanRegister,
+                    isUsernameExist: result === null || result === void 0 ? void 0 : result.isUsernameExist,
+                    isEmailExist: result === null || result === void 0 ? void 0 : result.isEmailExist,
+                };
             }
             catch (err) {
                 return _next(err);
@@ -114,8 +123,9 @@ class AuthService {
             try {
                 const payload = { username, email };
                 const canRegister = yield this.canRegister(Object.assign({}, payload), _next);
-                if (!canRegister)
+                if (!(canRegister === null || canRegister === void 0 ? void 0 : canRegister.isCanRegister)) {
                     return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL_OR_USERNAME, constants_1.HTTP_STATUS_CODE[400].code));
+                }
                 const newUser = yield prisma_1.default.user.create({
                     data: {
                         username,

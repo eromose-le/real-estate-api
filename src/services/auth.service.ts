@@ -5,9 +5,13 @@ import { ErrorResponse } from "../utils/errorResponse";
 import { NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { EnvKeys } from "../common/EnvKeys";
-import { RegisterUserDto } from "types/auth.types";
+import { CanRegisterResponse, RegisterUserDto } from "types/auth.types";
+import { UserService } from "./user.service";
 
+const userService = new UserService();
 export class AuthService {
+  // constructor(public userService: UserService) {}
+
   async hashPassword(_password: string): Promise<string> {
     try {
       return await bcrypt.hash(_password, 10);
@@ -111,18 +115,24 @@ export class AuthService {
       username: string;
     },
     _next: NextFunction
-  ): Promise<boolean | void> {
+  ): Promise<CanRegisterResponse | void> {
     try {
       const [username, email] = await Promise.all([
-        this.validatedUsername(_payload.username, _next),
-        this.validatedEmail(_payload.email, _next),
+        userService.getUserByUsername(_payload.username, _next),
+        userService.getUserByEmail(_payload.email, _next),
       ]);
 
-      if (!!username || !!email) {
-        return !(!!username && !!email);
-      }
+      const result: CanRegisterResponse = {
+        isCanRegister: !(!!username && !!email),
+        isUsernameExist: !!username,
+        isEmailExist: !!email,
+      };
 
-      return true;
+      return {
+        isCanRegister: result?.isCanRegister,
+        isUsernameExist: result?.isUsernameExist,
+        isEmailExist: result?.isEmailExist,
+      };
     } catch (err) {
       return _next(err);
     }
@@ -136,13 +146,14 @@ export class AuthService {
       const payload = { username, email };
       const canRegister = await this.canRegister({ ...payload }, _next);
 
-      if (!canRegister)
+      if (!canRegister?.isCanRegister) {
         return _next(
           new ErrorResponse(
             ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL_OR_USERNAME,
             HTTP_STATUS_CODE[400].code
           )
         );
+      }
 
       const newUser = await prisma.user.create({
         data: {

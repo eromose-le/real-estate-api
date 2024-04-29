@@ -50,6 +50,7 @@ export const login = asyncHandler(
 
     if (isValid) {
       const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
+      
       const token = await authService.generateCookieToken(
         userExist?.id,
         SEVEN_DAYS

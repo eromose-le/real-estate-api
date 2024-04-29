@@ -6,6 +6,8 @@ exports.ERROR_MESSAGES = {
     GENERIC_MESSAGE: "Sorry, an error occurred",
     USER_NOT_FOUND: "Sorry, user not found",
     USER_EXISTS_WITH_EMAIL_OR_USERNAME: "Sorry, user already exists",
+    USER_EXISTS_WITH_USERNAME: "Sorry, username already exists",
+    USER_EXISTS_WITH_EMAIL: "Sorry, email already exists",
     INVALID_OTP: "Invalid/Expired OTP Entered",
     TOKEN_EXPIRED: "Sorry, this token is expired or invalid",
     INVALID_CREDENTIALS: "Invalid Credentials",

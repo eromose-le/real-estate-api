@@ -15,19 +15,37 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const constants_1 = require("../constants");
 const prisma_1 = __importDefault(require("../lib/prisma"));
+const errorResponse_1 = require("../utils/errorResponse");
 class UserService {
-    getUserByUsername(_username) {
+    getUserByUsername(_username, _next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const user = yield prisma_1.default.user.findUnique({
                     where: { username: _username },
                 });
-                if (!user)
-                    throw new Error(constants_1.ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL_OR_USERNAME);
+                if (user) {
+                    return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_EXISTS_WITH_USERNAME, constants_1.HTTP_STATUS_CODE[400].code));
+                }
                 return user;
             }
             catch (err) {
-                return err;
+                return _next(err);
+            }
+        });
+    }
+    getUserByEmail(_email, _next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield prisma_1.default.user.findUnique({
+                    where: { email: _email },
+                });
+                if (user) {
+                    return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_EXISTS_WITH_EMAIL, constants_1.HTTP_STATUS_CODE[400].code));
+                }
+                return user;
+            }
+            catch (err) {
+                return _next(err);
             }
         });
     }
