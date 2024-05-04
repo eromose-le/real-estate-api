@@ -33,14 +33,14 @@ class AuthService {
             }
         });
     }
-    generateCookieToken(_userId, _expireTime) {
-        return __awaiter(this, void 0, void 0, function* () {
+    generateCookieToken(_userId_1, _expireTime_1) {
+        return __awaiter(this, arguments, void 0, function* (_userId, _expireTime, _isAdmin = false) {
             try {
                 const secret = EnvKeys_1.EnvKeys.JWT_SECRET;
                 // res.setHeader("Set-Cookie", "test=" + "myValue").json("success")
                 const token = jsonwebtoken_1.default.sign({
                     id: _userId,
-                    isAdmin: false,
+                    isAdmin: _isAdmin,
                 }, secret, { expiresIn: _expireTime });
                 return token;
             }

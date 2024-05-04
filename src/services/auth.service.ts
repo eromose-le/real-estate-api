@@ -22,7 +22,8 @@ export class AuthService {
 
   async generateCookieToken(
     _userId: string,
-    _expireTime: number
+    _expireTime: number,
+    _isAdmin: boolean = false
   ): Promise<string> {
     try {
       const secret = EnvKeys.JWT_SECRET;
@@ -32,7 +33,7 @@ export class AuthService {
       const token = jwt.sign(
         {
           id: _userId,
-          isAdmin: false,
+          isAdmin: _isAdmin,
         },
         secret,
         { expiresIn: _expireTime }
@@ -109,10 +110,11 @@ export class AuthService {
     }
   }
 
-  async canRegister(
+  private async canRegister(
     _payload: {
       email: string;
       username: string;
+      dto?: any;
     },
     _next: NextFunction
   ): Promise<CanRegisterResponse | void> {

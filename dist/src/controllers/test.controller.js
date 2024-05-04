@@ -12,21 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyToken = void 0;
-const constants_1 = require("../constants");
-const EnvKeys_1 = require("../common/EnvKeys");
+exports.shouldBeAdmin = exports.shouldBeLoggedIn = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const verifyToken = (req, res, next) => {
+const async_1 = require("../middleware/async");
+const EnvKeys_1 = require("../common/EnvKeys");
+const constants_1 = require("../constants");
+exports.shouldBeLoggedIn = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.userId);
+    res.status(200).json({ message: "You are Authenticated" });
+}));
+exports.shouldBeAdmin = (0, async_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.cookies.token;
     if (!token)
         return res.status(401).json({ message: constants_1.ERROR_MESSAGES.NOT_AUTHENTICATED });
     const secret = EnvKeys_1.EnvKeys.JWT_SECRET;
     jsonwebtoken_1.default.verify(token, secret, (err, payload) => __awaiter(void 0, void 0, void 0, function* () {
-        if (err)
+        if (err) {
             return res.status(403).json({ message: constants_1.ERROR_MESSAGES.TOKEN_EXPIRED });
-        console.log("[PAYLOAD]", payload);
-        req.userId = payload.id;
-        next();
+        }
+        if (!(payload === null || payload === void 0 ? void 0 : payload.isAdmin)) {
+            return res.status(403).json({ message: constants_1.ERROR_MESSAGES.NOT_AUTHORIZED });
+        }
     }));
-};
-exports.verifyToken = verifyToken;
+    res.status(200).json({ message: "Hey Admin!, you are Authenticated" });
+}));

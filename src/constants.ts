@@ -7,6 +7,8 @@ export const ERROR_MESSAGES = {
   USER_EXISTS_WITH_EMAIL: "Sorry, email already exists",
   INVALID_OTP: "Invalid/Expired OTP Entered",
   TOKEN_EXPIRED: "Sorry, this token is expired or invalid",
+  NOT_AUTHORIZED: "Sorry, you are not authorized!",
+  NOT_AUTHENTICATED: "Sorry, you are not authenticated!",
   INVALID_CREDENTIALS: "Invalid Credentials",
   INVALID_IDENTIFIER: "Invalid Identifier Received",
   INVALID_PAYLOAD: "Invalid payload",

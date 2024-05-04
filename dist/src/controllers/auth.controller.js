@@ -56,7 +56,8 @@ exports.login = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, 
         return;
     if (isValid) {
         const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
-        const token = yield authService.generateCookieToken(userExist === null || userExist === void 0 ? void 0 : userExist.id, SEVEN_DAYS);
+        const isAdmin = true;
+        const token = yield authService.generateCookieToken(userExist === null || userExist === void 0 ? void 0 : userExist.id, SEVEN_DAYS, isAdmin);
         const { password: userPassword } = userExist, userInfo = __rest(userExist, ["password"]);
         res
             .cookie("token", token, {

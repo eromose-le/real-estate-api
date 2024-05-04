@@ -51,10 +51,12 @@ export const login = asyncHandler(
 
     if (isValid) {
       const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
+      const isAdmin = true
 
       const token = await authService.generateCookieToken(
         userExist?.id,
-        SEVEN_DAYS
+        SEVEN_DAYS,
+        isAdmin
       );
       const { password: userPassword, ...userInfo } = userExist;
 

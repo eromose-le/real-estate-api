@@ -12,8 +12,8 @@ const constants_1 = require("./src/constants");
 const error_1 = require("./src/middleware/error");
 const EnvKeys_1 = require("./src/common/EnvKeys");
 const auth_route_1 = __importDefault(require("./src/routes/auth.route"));
+const test_route_js_1 = __importDefault(require("./src/routes/test.route.js"));
 // import postRoute from "./src/routes/post.route.js";
-// import testRoute from "./src/routes/test.route.js";
 // import userRoute from "./src/routes/user.route.js";
 // import chatRoute from "./src/routes/chat.route.js";
 // import messageRoute from "./src/routes/message.route.js";
@@ -26,9 +26,9 @@ if (EnvKeys_1.EnvKeys.isLocal()) {
     app.use((0, morgan_1.default)("dev"));
 }
 app.use(`${apiPath}/auth`, auth_route_1.default);
+app.use(`${apiPath}/test`, test_route_js_1.default);
 // app.use(`${apiPath}/users`, userRoute);
 // app.use(`${apiPath}/posts`, postRoute);
-// app.use(`${apiPath}/test`, testRoute);
 // app.use(`${apiPath}/chats`, chatRoute);
 // app.use(`${apiPath}/messages`, messageRoute);
 app.use(error_1.errorHandler);

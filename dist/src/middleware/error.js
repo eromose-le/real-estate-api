@@ -34,6 +34,11 @@ const errorHandler = (err, req, res, next) => {
         const message = "Record already exist";
         error = new errorResponse_1.ErrorResponse(message, 400);
     }
+    // PrismaClientValidationError
+    if (err.name === "PrismaClientValidationError") {
+        const message = "Bad request, check submitted data";
+        error = new errorResponse_1.ErrorResponse(message, 400);
+    }
     res.status(error.statusCode || 500).json({
         statusCode: error.statusCode,
         success: false,

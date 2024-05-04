@@ -54,6 +54,12 @@ export const errorHandler = (
     error = new ErrorResponse(message, 400);
   }
 
+  // PrismaClientValidationError
+  if (err.name === "PrismaClientValidationError") {
+    const message = "Bad request, check submitted data";
+    error = new ErrorResponse(message, 400);
+  }
+
   res.status(error.statusCode || 500).json({
     statusCode: error.statusCode,
     success: false,
