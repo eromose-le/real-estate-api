@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
+
 type AsyncHandlerFunction = (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => Promise<any>;
