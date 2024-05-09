@@ -9,8 +9,8 @@ import { EnvKeys } from "./src/common/EnvKeys";
 
 import authRoute from "./src/routes/auth.route";
 import testRoute from "./src/routes/test.route.js";
+import userRoute from "./src/routes/user.route.js";
 // import postRoute from "./src/routes/post.route.js";
-// import userRoute from "./src/routes/user.route.js";
 // import chatRoute from "./src/routes/chat.route.js";
 // import messageRoute from "./src/routes/message.route.js";
 
@@ -27,7 +27,7 @@ if (EnvKeys.isLocal()) {
 
 app.use(`${apiPath}/auth`, authRoute);
 app.use(`${apiPath}/test`, testRoute);
-// app.use(`${apiPath}/users`, userRoute);
+app.use(`${apiPath}/users`, userRoute);
 // app.use(`${apiPath}/posts`, postRoute);
 // app.use(`${apiPath}/chats`, chatRoute);
 // app.use(`${apiPath}/messages`, messageRoute);

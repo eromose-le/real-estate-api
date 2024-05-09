@@ -19,12 +19,20 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const verifyToken = (req, res, next) => {
     const token = req.cookies.token;
     if (!token)
-        return res.status(401).json({ message: constants_1.ERROR_MESSAGES.NOT_AUTHENTICATED });
+        return res.status(401).json({
+            error: constants_1.ERROR_MESSAGES.NOT_AUTHENTICATED,
+            success: false,
+            statusCode: constants_1.HTTP_STATUS_CODE[401],
+        });
     const secret = EnvKeys_1.EnvKeys.JWT_SECRET;
     jsonwebtoken_1.default.verify(token, secret, (err, payload) => __awaiter(void 0, void 0, void 0, function* () {
         if (err)
-            return res.status(403).json({ message: constants_1.ERROR_MESSAGES.TOKEN_EXPIRED });
-        console.log("[PAYLOAD]", payload);
+            return res.status(403).json({
+                error: constants_1.ERROR_MESSAGES.TOKEN_EXPIRED,
+                success: false,
+                statusCode: constants_1.HTTP_STATUS_CODE[403],
+            });
+        console.log("[verify]", payload);
         req.userId = payload.id;
         next();
     }));
