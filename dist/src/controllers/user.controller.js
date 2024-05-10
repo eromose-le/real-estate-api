@@ -28,6 +28,7 @@ const prisma_js_1 = __importDefault(require("../lib/prisma.js"));
 const async_js_1 = require("../middleware/async.js");
 const user_service_js_1 = require("../services/user.service.js");
 const auth_service_js_1 = require("../services/auth.service.js");
+const constants_js_1 = require("../constants.js");
 const authService = new auth_service_js_1.AuthService();
 const userService = new user_service_js_1.UserService();
 exports.getUsers = (0, async_js_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -59,27 +60,29 @@ exports.updateUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(
     const _a = req.body, { password, avatar } = _a, inputs = __rest(_a, ["password", "avatar"]);
     // NOTE: handle error messages
     if (id !== tokenUserId) {
-        return res.status(403).json({ message: "Not Authorized!" });
+        return res.status(403).json({
+            error: constants_js_1.ERROR_MESSAGES.NOT_AUTHORIZED,
+            success: false,
+            statusCode: constants_js_1.HTTP_STATUS_CODE[403],
+        });
     }
     let updatedPassword = null;
-    try {
-        if (password) {
-            updatedPassword = yield authService.hashPassword(password);
-        }
-        const payload = Object.assign(Object.assign(Object.assign({}, inputs), (updatedPassword && { password: updatedPassword })), (avatar && { avatar }));
-        const updatedUser = yield userService.update({ id, payload }, next);
-        res.status(200).json(updatedUser);
+    if (password) {
+        updatedPassword = yield authService.hashPassword(password);
     }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Failed to update users!" });
-    }
+    const payload = Object.assign(Object.assign(Object.assign({}, inputs), (updatedPassword && { password: updatedPassword })), (avatar && { avatar }));
+    const updatedUser = yield userService.update({ id, payload }, next);
+    res.status(200).json(updatedUser);
 }));
 exports.deleteUser = (0, async_js_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const tokenUserId = req.userId;
     if (id !== tokenUserId) {
-        return res.status(403).json({ message: "Not Authorized!" });
+        return res.status(403).json({
+            error: constants_js_1.ERROR_MESSAGES.NOT_AUTHORIZED,
+            success: false,
+            statusCode: constants_js_1.HTTP_STATUS_CODE[403],
+        });
     }
     try {
         yield prisma_js_1.default.user.delete({

@@ -4,6 +4,7 @@ import { asyncHandler } from "../middleware/async.js";
 import { UpdateUserDto } from "../types/user.types.js";
 import { UserService } from "../services/user.service.js";
 import { AuthService } from "../services/auth.service.js";
+import { ERROR_MESSAGES, HTTP_STATUS_CODE } from "../constants.js";
 
 const authService = new AuthService();
 const userService = new UserService();
@@ -38,29 +39,28 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   // NOTE: handle error messages
   if (id !== tokenUserId) {
-    return res.status(403).json({ message: "Not Authorized!" });
+    return res.status(403).json({
+      error: ERROR_MESSAGES.NOT_AUTHORIZED,
+      success: false,
+      statusCode: HTTP_STATUS_CODE[403],
+    });
   }
 
   let updatedPassword = null;
 
-  try {
-    if (password) {
-      updatedPassword = await authService.hashPassword(password);
-    }
-
-    const payload: Partial<UpdateUserDto> = {
-      ...inputs,
-      ...(updatedPassword && { password: updatedPassword }),
-      ...(avatar && { avatar }),
-    };
-
-    const updatedUser = await userService.update({ id, payload }, next);
-
-    res.status(200).json(updatedUser);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Failed to update users!" });
+  if (password) {
+    updatedPassword = await authService.hashPassword(password);
   }
+
+  const payload: Partial<UpdateUserDto> = {
+    ...inputs,
+    ...(updatedPassword && { password: updatedPassword }),
+    ...(avatar && { avatar }),
+  };
+
+  const updatedUser = await userService.update({ id, payload }, next);
+
+  res.status(200).json(updatedUser);
 });
 
 export const deleteUser = asyncHandler(async (req, res) => {
@@ -68,7 +68,11 @@ export const deleteUser = asyncHandler(async (req, res) => {
   const tokenUserId = req.userId;
 
   if (id !== tokenUserId) {
-    return res.status(403).json({ message: "Not Authorized!" });
+    return res.status(403).json({
+      error: ERROR_MESSAGES.NOT_AUTHORIZED,
+      success: false,
+      statusCode: HTTP_STATUS_CODE[403],
+    });
   }
 
   try {
