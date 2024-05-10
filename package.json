@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "console-ninja node --watch dist/app.js",
-    "run-migration": "npx prisma db push",
+    "run-migrations": "npx prisma db push",
     "build": "rimraf dist && npx tsc",
     "prestart": "npm run build",
     "start": "console-ninja node --watch dist/app.js",
