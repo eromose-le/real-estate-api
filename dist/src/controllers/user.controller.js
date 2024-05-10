@@ -19,46 +19,27 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.updateUser = exports.getUser = exports.getUsers = void 0;
-const prisma_js_1 = __importDefault(require("../lib/prisma.js"));
 const async_js_1 = require("../middleware/async.js");
 const user_service_js_1 = require("../services/user.service.js");
 const auth_service_js_1 = require("../services/auth.service.js");
 const constants_js_1 = require("../constants.js");
 const authService = new auth_service_js_1.AuthService();
 const userService = new user_service_js_1.UserService();
-exports.getUsers = (0, async_js_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const users = yield prisma_js_1.default.user.findMany();
-        res.status(200).json(users);
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Failed to get users!" });
-    }
+exports.getUsers = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield userService.getUsers(next);
+    res.status(200).json(users);
 }));
-exports.getUser = (0, async_js_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    try {
-        const user = yield prisma_js_1.default.user.findUnique({
-            where: { id },
-        });
-        res.status(200).json(user);
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Failed to get user!" });
-    }
+    const user = yield userService.getUser({ id }, next);
+    res.status(200).json(user);
 }));
 exports.updateUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const tokenUserId = req.userId;
     const _a = req.body, { password, avatar } = _a, inputs = __rest(_a, ["password", "avatar"]);
-    // NOTE: handle error messages
     if (id !== tokenUserId) {
         return res.status(403).json({
             error: constants_js_1.ERROR_MESSAGES.NOT_AUTHORIZED,
@@ -74,7 +55,7 @@ exports.updateUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(
     const updatedUser = yield userService.update({ id, payload }, next);
     res.status(200).json(updatedUser);
 }));
-exports.deleteUser = (0, async_js_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.deleteUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const tokenUserId = req.userId;
     if (id !== tokenUserId) {
@@ -84,16 +65,8 @@ exports.deleteUser = (0, async_js_1.asyncHandler)((req, res) => __awaiter(void 0
             statusCode: constants_js_1.HTTP_STATUS_CODE[403],
         });
     }
-    try {
-        yield prisma_js_1.default.user.delete({
-            where: { id },
-        });
-        res.status(200).json({ message: "User deleted" });
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Failed to delete users!" });
-    }
+    yield userService.delete({ id }, next);
+    res.status(200).json({ message: "User deleted" });
 }));
 // export const savePost = asyncHandler(async (req, res) => {
 //   const postId = req.body.postId;

@@ -6,6 +6,7 @@ export const ERROR_MESSAGES = {
   USER_EXISTS_WITH_USERNAME: "Sorry, username already exists",
   USER_EXISTS_WITH_EMAIL: "Sorry, email already exists",
   PROFILE_UPDATE_FAILED: "Sorry, profile update failed",
+  USER_DELETE_FAILED: "Sorry, failed to delete",
   INVALID_OTP: "Invalid/Expired OTP Entered",
   TOKEN_EXPIRED: "Sorry, this token is expired or invalid",
   NOT_AUTHORIZED: "Sorry, you are not authorized!",

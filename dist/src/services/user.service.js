@@ -60,6 +60,38 @@ class UserService {
             }
         });
     }
+    getUsers(_next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const users = yield prisma_1.default.user.findMany();
+                if (!users) {
+                    return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_NOT_FOUND, constants_1.HTTP_STATUS_CODE[400].code));
+                }
+                return users;
+            }
+            catch (err) {
+                return _next(err);
+            }
+        });
+    }
+    getUser(_a, _next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var dto = __rest(_a, []);
+            const { id: _id } = dto;
+            try {
+                const user = yield prisma_1.default.user.findUnique({
+                    where: { id: _id },
+                });
+                if (!user) {
+                    return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_NOT_FOUND, constants_1.HTTP_STATUS_CODE[400].code));
+                }
+                return user;
+            }
+            catch (err) {
+                return _next(err);
+            }
+        });
+    }
     update(_a, _next) {
         return __awaiter(this, void 0, void 0, function* () {
             var dto = __rest(_a, []);
@@ -79,6 +111,21 @@ class UserService {
             }
             catch (err) {
                 return _next(err);
+            }
+        });
+    }
+    delete(_a, _next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var dto = __rest(_a, []);
+            const { id: _id } = dto;
+            try {
+                yield prisma_1.default.user.delete({
+                    where: { id: _id },
+                });
+                return null;
+            }
+            catch (err) {
+                return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_DELETE_FAILED, constants_1.HTTP_STATUS_CODE[400].code));
             }
         });
     }

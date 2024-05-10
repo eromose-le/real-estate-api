@@ -47,6 +47,50 @@ export class UserService {
     }
   }
 
+  async getUsers(_next: NextFunction): Promise<any | void> {
+    try {
+      const users = await prisma.user.findMany();
+
+      if (!users) {
+        return _next(
+          new ErrorResponse(
+            ERROR_MESSAGES.USER_NOT_FOUND,
+            HTTP_STATUS_CODE[400].code
+          )
+        );
+      }
+
+      return users;
+    } catch (err) {
+      return _next(err);
+    }
+  }
+
+  async getUser(
+    { ...dto }: { id: string },
+    _next: NextFunction
+  ): Promise<any | void> {
+    const { id: _id } = dto;
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: _id },
+      });
+
+      if (!user) {
+        return _next(
+          new ErrorResponse(
+            ERROR_MESSAGES.USER_NOT_FOUND,
+            HTTP_STATUS_CODE[400].code
+          )
+        );
+      }
+
+      return user;
+    } catch (err) {
+      return _next(err);
+    }
+  }
+
   async update(
     { ...dto }: UpdateUserParams,
     _next: NextFunction
@@ -78,6 +122,27 @@ export class UserService {
       return rest;
     } catch (err) {
       return _next(err);
+    }
+  }
+
+  async delete(
+    { ...dto }: { id: string },
+    _next: NextFunction
+  ): Promise<any | void> {
+    const { id: _id } = dto;
+    try {
+      await prisma.user.delete({
+        where: { id: _id },
+      });
+
+      return null;
+    } catch (err) {
+      return _next(
+        new ErrorResponse(
+          ERROR_MESSAGES.USER_DELETE_FAILED,
+          HTTP_STATUS_CODE[400].code
+        )
+      );
     }
   }
 }

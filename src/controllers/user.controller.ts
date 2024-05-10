@@ -1,5 +1,3 @@
-import { Request, Response } from "express";
-import prisma from "../lib/prisma.js";
 import { asyncHandler } from "../middleware/async.js";
 import { UpdateUserDto } from "../types/user.types.js";
 import { UserService } from "../services/user.service.js";
@@ -9,27 +7,17 @@ import { ERROR_MESSAGES, HTTP_STATUS_CODE } from "../constants.js";
 const authService = new AuthService();
 const userService = new UserService();
 
-export const getUsers = asyncHandler(async (req: Request, res: Response) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.status(200).json(users);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Failed to get users!" });
-  }
+export const getUsers = asyncHandler(async (req, res, next) => {
+  const users = await userService.getUsers(next);
+  res.status(200).json(users);
 });
 
-export const getUser = asyncHandler(async (req: Request, res: Response) => {
+export const getUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
-    res.status(200).json(user);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Failed to get user!" });
-  }
+
+  const user = await userService.getUser({ id }, next);
+
+  res.status(200).json(user);
 });
 
 export const updateUser = asyncHandler(async (req, res, next) => {
@@ -37,7 +25,6 @@ export const updateUser = asyncHandler(async (req, res, next) => {
   const tokenUserId = req.userId;
   const { password, avatar, ...inputs } = req.body as UpdateUserDto;
 
-  // NOTE: handle error messages
   if (id !== tokenUserId) {
     return res.status(403).json({
       error: ERROR_MESSAGES.NOT_AUTHORIZED,
@@ -63,7 +50,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
   res.status(200).json(updatedUser);
 });
 
-export const deleteUser = asyncHandler(async (req, res) => {
+export const deleteUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const tokenUserId = req.userId;
 
@@ -75,15 +62,9 @@ export const deleteUser = asyncHandler(async (req, res) => {
     });
   }
 
-  try {
-    await prisma.user.delete({
-      where: { id },
-    });
-    res.status(200).json({ message: "User deleted" });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Failed to delete users!" });
-  }
+  await userService.delete({ id }, next);
+
+  res.status(200).json({ message: "User deleted" });
 });
 
 // export const savePost = asyncHandler(async (req, res) => {
