@@ -17,6 +17,9 @@ exports.ERROR_MESSAGES = {
     INVALID_CREDENTIALS: "Invalid Credentials",
     INVALID_IDENTIFIER: "Invalid Identifier Received",
     INVALID_PAYLOAD: "Invalid payload",
+    POST_NOT_FOUND: "Sorry, post not found",
+    POST_DELETE_FAILED: "Sorry, failed to delete post",
+    POST_CREATE_FAILED: "Sorry, failed to create post",
 };
 exports.ENVIRONMENTS = {
     local: "local",

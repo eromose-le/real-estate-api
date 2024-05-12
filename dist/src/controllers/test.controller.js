@@ -19,7 +19,11 @@ const EnvKeys_1 = require("../common/EnvKeys");
 const constants_1 = require("../constants");
 exports.shouldBeLoggedIn = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(req.userId);
-    res.status(200).json({ message: "You are Authenticated" });
+    res.status(200).json({
+        message: "You are Authenticated",
+        data: null,
+        success: true,
+    });
 }));
 exports.shouldBeAdmin = (0, async_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.cookies.token;
@@ -46,5 +50,9 @@ exports.shouldBeAdmin = (0, async_1.asyncHandler)((req, res) => __awaiter(void 0
             });
         }
     }));
-    res.status(200).json({ message: "Hey Admin!, you are Authenticated" });
+    res.status(200).json({
+        message: "Hey Admin!, you are Authenticated",
+        data: null,
+        success: true,
+    });
 }));

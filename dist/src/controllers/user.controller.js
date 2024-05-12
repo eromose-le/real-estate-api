@@ -29,12 +29,20 @@ const authService = new auth_service_js_1.AuthService();
 const userService = new user_service_js_1.UserService();
 exports.getUsers = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield userService.getUsers(next);
-    res.status(200).json(users);
+    res.status(200).json({
+        message: "Fetch users successfully",
+        data: users,
+        success: !!users,
+    });
 }));
 exports.getUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const user = yield userService.getUser({ id }, next);
-    res.status(200).json(user);
+    res.status(200).json({
+        message: "Fetch user successfully",
+        data: user,
+        success: !!user,
+    });
 }));
 exports.updateUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -53,7 +61,11 @@ exports.updateUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(
     }
     const payload = Object.assign(Object.assign(Object.assign({}, inputs), (updatedPassword && { password: updatedPassword })), (avatar && { avatar }));
     const updatedUser = yield userService.update({ id, payload }, next);
-    res.status(200).json(updatedUser);
+    res.status(200).json({
+        message: "User updated successfully",
+        data: updatedUser,
+        success: !!updatedUser,
+    });
 }));
 exports.deleteUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -66,7 +78,11 @@ exports.deleteUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(
         });
     }
     yield userService.delete({ id }, next);
-    res.status(200).json({ message: "User deleted" });
+    res.status(200).json({
+        message: "User deleted successfully",
+        data: null,
+        success: true,
+    });
 }));
 // export const savePost = asyncHandler(async (req, res) => {
 //   const postId = req.body.postId;

@@ -9,7 +9,11 @@ const userService = new UserService();
 
 export const getUsers = asyncHandler(async (req, res, next) => {
   const users = await userService.getUsers(next);
-  res.status(200).json(users);
+  res.status(200).json({
+    message: "Fetch users successfully",
+    data: users,
+    success: !!users,
+  });
 });
 
 export const getUser = asyncHandler(async (req, res, next) => {
@@ -17,7 +21,11 @@ export const getUser = asyncHandler(async (req, res, next) => {
 
   const user = await userService.getUser({ id }, next);
 
-  res.status(200).json(user);
+  res.status(200).json({
+    message: "Fetch user successfully",
+    data: user,
+    success: !!user,
+  });
 });
 
 export const updateUser = asyncHandler(async (req, res, next) => {
@@ -47,7 +55,11 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   const updatedUser = await userService.update({ id, payload }, next);
 
-  res.status(200).json(updatedUser);
+  res.status(200).json({
+    message: "User updated successfully",
+    data: updatedUser,
+    success: !!updatedUser,
+  });
 });
 
 export const deleteUser = asyncHandler(async (req, res, next) => {
@@ -64,7 +76,11 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
 
   await userService.delete({ id }, next);
 
-  res.status(200).json({ message: "User deleted" });
+  res.status(200).json({
+    message: "User deleted successfully",
+    data: null,
+    success: true,
+  });
 });
 
 // export const savePost = asyncHandler(async (req, res) => {

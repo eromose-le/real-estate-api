@@ -62,7 +62,7 @@ exports.login = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, 
         res
             .cookie("token", token, {
             httpOnly: true, // Only client-side js access
-            // ...(false && { secure: true }), // Only https access
+            // ...(EnvKeys.isProduction() && { secure: true }), // Only https access
             maxAge: SEVEN_DAYS,
         })
             .status(200)
@@ -73,10 +73,10 @@ exports.login = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, 
         });
     }
 }));
-const logout = (req, res) => {
-    return res
-        .clearCookie("token")
-        .status(200)
-        .json({ message: "Logout Successful" });
-};
-exports.logout = logout;
+exports.logout = (0, async_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return res.clearCookie("token").status(200).json({
+        message: "Logout Successful",
+        data: null,
+        success: true,
+    });
+}));

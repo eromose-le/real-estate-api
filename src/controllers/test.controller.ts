@@ -15,7 +15,11 @@ interface Payload {
 export const shouldBeLoggedIn = asyncHandler(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     console.log(req.userId);
-    res.status(200).json({ message: "You are Authenticated" });
+    res.status(200).json({
+      message: "You are Authenticated",
+      data: null,
+      success: true,
+    });
   }
 );
 
@@ -52,5 +56,9 @@ export const shouldBeAdmin = asyncHandler(async (req, res) => {
     }
   );
 
-  res.status(200).json({ message: "Hey Admin!, you are Authenticated" });
+  res.status(200).json({
+    message: "Hey Admin!, you are Authenticated",
+    data: null,
+    success: true,
+  });
 });

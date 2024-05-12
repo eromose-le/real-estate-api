@@ -51,7 +51,7 @@ export const login = asyncHandler(
 
     if (isValid) {
       const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
-      const isAdmin = true
+      const isAdmin = true;
 
       const token = await authService.generateCookieToken(
         userExist?.id,
@@ -63,7 +63,7 @@ export const login = asyncHandler(
       res
         .cookie("token", token, {
           httpOnly: true, // Only client-side js access
-          // ...(false && { secure: true }), // Only https access
+          // ...(EnvKeys.isProduction() && { secure: true }), // Only https access
           maxAge: SEVEN_DAYS,
         })
         .status(200)
@@ -76,9 +76,10 @@ export const login = asyncHandler(
   }
 );
 
-export const logout = (req: Request, res: Response) => {
-  return res
-    .clearCookie("token")
-    .status(200)
-    .json({ message: "Logout Successful" });
-};
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+  return res.clearCookie("token").status(200).json({
+    message: "Logout Successful",
+    data: null,
+    success: true,
+  });
+});

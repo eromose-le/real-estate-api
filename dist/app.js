@@ -14,7 +14,7 @@ const EnvKeys_1 = require("./src/common/EnvKeys");
 const auth_route_1 = __importDefault(require("./src/routes/auth.route"));
 const test_route_js_1 = __importDefault(require("./src/routes/test.route.js"));
 const user_route_js_1 = __importDefault(require("./src/routes/user.route.js"));
-// import postRoute from "./src/routes/post.route.js";
+const post_route_js_1 = __importDefault(require("./src/routes/post.route.js"));
 // import chatRoute from "./src/routes/chat.route.js";
 // import messageRoute from "./src/routes/message.route.js";
 const app = (0, express_1.default)();
@@ -28,7 +28,7 @@ if (EnvKeys_1.EnvKeys.isLocal()) {
 app.use(`${apiPath}/auth`, auth_route_1.default);
 app.use(`${apiPath}/test`, test_route_js_1.default);
 app.use(`${apiPath}/users`, user_route_js_1.default);
-// app.use(`${apiPath}/posts`, postRoute);
+app.use(`${apiPath}/posts`, post_route_js_1.default);
 // app.use(`${apiPath}/chats`, chatRoute);
 // app.use(`${apiPath}/messages`, messageRoute);
 app.use(error_1.errorHandler);
