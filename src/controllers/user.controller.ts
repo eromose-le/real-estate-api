@@ -3,6 +3,8 @@ import { UpdateUserDto } from "../types/user.types.js";
 import { UserService } from "../services/user.service.js";
 import { AuthService } from "../services/auth.service.js";
 import { ERROR_MESSAGES, HTTP_STATUS_CODE } from "../constants.js";
+import { ErrorResponse } from "../utils/errorResponse.js";
+import { verifyOwner } from "../middleware/verifyOwner.js";
 
 const authService = new AuthService();
 const userService = new UserService();
@@ -18,6 +20,14 @@ export const getUsers = asyncHandler(async (req, res, next) => {
 
 export const getUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
+
+  if (!id) {
+    return res.status(400).json({
+      error: ERROR_MESSAGES.INVALID_PAYLOAD,
+      success: false,
+      statusCode: HTTP_STATUS_CODE[400].code,
+    });
+  }
 
   const user = await userService.getUser({ id }, next);
 
@@ -66,14 +76,7 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const tokenUserId = req.userId;
 
-  if (id !== tokenUserId) {
-    return res.status(403).json({
-      error: ERROR_MESSAGES.NOT_AUTHORIZED,
-      success: false,
-      statusCode: HTTP_STATUS_CODE[403],
-    });
-  }
-
+  await verifyOwner(res, next, id, tokenUserId);
   await userService.delete({ id }, next);
 
   res.status(200).json({

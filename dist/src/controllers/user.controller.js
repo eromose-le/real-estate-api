@@ -25,6 +25,7 @@ const async_js_1 = require("../middleware/async.js");
 const user_service_js_1 = require("../services/user.service.js");
 const auth_service_js_1 = require("../services/auth.service.js");
 const constants_js_1 = require("../constants.js");
+const verifyOwner_js_1 = require("../middleware/verifyOwner.js");
 const authService = new auth_service_js_1.AuthService();
 const userService = new user_service_js_1.UserService();
 exports.getUsers = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -37,6 +38,13 @@ exports.getUsers = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(vo
 }));
 exports.getUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
+    if (!id) {
+        return res.status(400).json({
+            error: constants_js_1.ERROR_MESSAGES.INVALID_PAYLOAD,
+            success: false,
+            statusCode: constants_js_1.HTTP_STATUS_CODE[400].code,
+        });
+    }
     const user = yield userService.getUser({ id }, next);
     res.status(200).json({
         message: "Fetch user successfully",
@@ -70,13 +78,7 @@ exports.updateUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(
 exports.deleteUser = (0, async_js_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const tokenUserId = req.userId;
-    if (id !== tokenUserId) {
-        return res.status(403).json({
-            error: constants_js_1.ERROR_MESSAGES.NOT_AUTHORIZED,
-            success: false,
-            statusCode: constants_js_1.HTTP_STATUS_CODE[403],
-        });
-    }
+    yield (0, verifyOwner_js_1.verifyOwner)(res, next, id, tokenUserId);
     yield userService.delete({ id }, next);
     res.status(200).json({
         message: "User deleted successfully",

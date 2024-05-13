@@ -27,6 +27,13 @@ exports.UserService = void 0;
 const constants_1 = require("../constants");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const errorResponse_1 = require("../utils/errorResponse");
+const userFilter = {
+    id: true,
+    email: true,
+    username: true,
+    avatar: true,
+    createdAt: true,
+};
 class UserService {
     getUserByUsername(_username, _next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -63,7 +70,9 @@ class UserService {
     getUsers(_next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const users = yield prisma_1.default.user.findMany();
+                const users = yield prisma_1.default.user.findMany({
+                    select: Object.assign({}, userFilter),
+                });
                 if (!users) {
                     return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_NOT_FOUND, constants_1.HTTP_STATUS_CODE[400].code));
                 }
@@ -81,6 +90,7 @@ class UserService {
             try {
                 const user = yield prisma_1.default.user.findUnique({
                     where: { id: _id },
+                    select: Object.assign({}, userFilter),
                 });
                 if (!user) {
                     return _next(new errorResponse_1.ErrorResponse(constants_1.ERROR_MESSAGES.USER_NOT_FOUND, constants_1.HTTP_STATUS_CODE[400].code));
@@ -119,6 +129,7 @@ class UserService {
             var dto = __rest(_a, []);
             const { id: _id } = dto;
             try {
+                yield this.getUser({ id: _id }, _next);
                 yield prisma_1.default.user.delete({
                     where: { id: _id },
                 });

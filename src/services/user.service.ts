@@ -4,6 +4,14 @@ import prisma from "../lib/prisma";
 import { ErrorResponse } from "../utils/errorResponse";
 import { UpdateUserResponse, UpdateUserParams } from "types/user.types";
 
+const userFilter = {
+  id: true,
+  email: true,
+  username: true,
+  avatar: true,
+  createdAt: true,
+};
+
 export class UserService {
   async getUserByUsername(_username: string, _next: NextFunction) {
     try {
@@ -49,7 +57,9 @@ export class UserService {
 
   async getUsers(_next: NextFunction): Promise<any | void> {
     try {
-      const users = await prisma.user.findMany();
+      const users = await prisma.user.findMany({
+        select: { ...userFilter },
+      });
 
       if (!users) {
         return _next(
@@ -71,9 +81,11 @@ export class UserService {
     _next: NextFunction
   ): Promise<any | void> {
     const { id: _id } = dto;
+
     try {
       const user = await prisma.user.findUnique({
         where: { id: _id },
+        select: { ...userFilter },
       });
 
       if (!user) {
@@ -130,7 +142,9 @@ export class UserService {
     _next: NextFunction
   ): Promise<any | void> {
     const { id: _id } = dto;
+
     try {
+      await this.getUser({ id: _id }, _next);
       await prisma.user.delete({
         where: { id: _id },
       });

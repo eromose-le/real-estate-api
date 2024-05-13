@@ -31,7 +31,7 @@ const errorHandler = (err, req, res, next) => {
     }
     // PrismaClientKnownRequestError
     if (err.name === "PrismaClientKnownRequestError") {
-        const message = "Record already exist";
+        const message = "An errror occured. check payload";
         error = new errorResponse_1.ErrorResponse(message, 400);
     }
     // PrismaClientValidationError

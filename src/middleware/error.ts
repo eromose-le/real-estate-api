@@ -50,7 +50,7 @@ export const errorHandler = (
 
   // PrismaClientKnownRequestError
   if (err.name === "PrismaClientKnownRequestError") {
-    const message = "Record already exist";
+    const message = "An errror occured. check payload";
     error = new ErrorResponse(message, 400);
   }
 
